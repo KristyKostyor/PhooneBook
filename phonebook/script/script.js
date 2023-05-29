@@ -193,8 +193,12 @@ const data = [
     app.append(header, main, footer);
     return {
       list: table.tbody,
+      logo,
+      btnAdd: buttonGroup.btns[0],
+      formOverlay: form.overlay,
     };
   };
+
   const createRow = ({name: firstName, surname, phone}) => {
     const tr = document.createElement('tr');
     const tdDel = document.createElement('td');
@@ -202,6 +206,12 @@ const data = [
     tdDel.append(buttonDel);
     tdDel.classList.add('delete');
     buttonDel.classList.add('del-icon');
+
+    const tdEdit = document.createElement('td');
+    const buttonEdit = document.createElement('button');
+    buttonEdit.textContent = 'Редактировать';
+    tdEdit.append(buttonEdit);
+
     const tdName = document.createElement('td');
     tdName.textContent = firstName;
     const tdSurname = document.createElement('td');
@@ -211,26 +221,58 @@ const data = [
     const phoneLink = document.createElement('a');
     phoneLink.href = `tel:${phone}`;
     phoneLink.textContent = phone;
+    tr.phoneLink = phoneLink;
 
-    tr.append(tdDel, tdName, tdSurname, tdPhone);
+    tr.append(tdDel, tdName, tdSurname, tdPhone, tdEdit);
     tdPhone.append(phoneLink);
 
     return tr;
   };
+  const hoverRow = (allRow, logo) => {
+    const text = logo.textContent;
 
+    allRow.forEach(contact => {
+      contact.addEventListener('mouseenter', () => {
+        logo.textContent = contact.phoneLink.textContent;
+      });
+      contact.addEventListener('mouseleave', () => {
+        logo.textContent = text;
+      });
+    });
+  };
 
   const renderContacts = (elem, data) => {
     const allRow = data.map(createRow);
     elem.append(...allRow);
+    return allRow;
   };
 
   const init = (selectorApp, title) => {
     const app = document.querySelector(selectorApp);
     const phoneBook = renderPhoneBook(app, title);
+    const {list, logo, btnAdd, formOverlay} = phoneBook;
+    const form = formOverlay.querySelector('.form');
+    const allRow = renderContacts(list, data);
+    hoverRow(allRow, logo);
 
-    const {list} = phoneBook;
-    renderContacts(list, data);
+    btnAdd.addEventListener('click', () => {
+      formOverlay.classList.add('is-visible');
+    });
+
+    form.addEventListener('click', (event) => {
+      event.stopPropagation();
+    });
+    formOverlay.addEventListener('click', () => {
+      formOverlay.classList.remove('is-visible');
+    });
+    allRow.forEach((row) => {
+      const buttonEdit = row.querySelector('td:last-child button');
+      buttonEdit.addEventListener('click', handleEdit);
+    });
   };
+  function handleEdit(event) {
+    console.log('Редактирование контакта');
+  }
 
   window.phoneBookInit = init;
 }
