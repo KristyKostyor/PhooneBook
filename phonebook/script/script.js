@@ -250,8 +250,8 @@ const data = [
   const init = (selectorApp, title) => {
     const app = document.querySelector(selectorApp);
     const phoneBook = renderPhoneBook(app, title);
-    const {list, logo, btnAdd, formOverlay} = phoneBook;
-    const form = formOverlay.querySelector('.form');
+    const {list, logo, btnAdd, formOverlay, form} = phoneBook;
+
     const allRow = renderContacts(list, data);
     hoverRow(allRow, logo);
 
