@@ -24,7 +24,9 @@ const data = [
 ];
 
 
-{
+{ const addContactData = (contact) => {
+  data.push(contact);
+};
   const createContainer = () => {
     const container = document.createElement('div');
     container.classList.add('container');
@@ -109,9 +111,40 @@ const data = [
     const tbody = document.createElement('tbody');
     table.append(thead, tbody);
     table.tbody = tbody;
-
+const sortHeaders = table.querySelectorAll(".sortable");
+sortHeaders.forEach((header) => {
+  header.addEventListener("click", () => {
+    const sortBy = header.getAttribute("data-sort");
+    sortTableByColumn(table, sortBy);
+  });
+});
     return table;
   };
+const sortTableByColumn = (table, column) => {
+  const tbody = table.tbody;
+  const rows = Array.from(tbody.querySelectorAll("tr"));
+
+  // Сортировка строк таблицы
+  rows.sort((a, b) => {
+    const cellA = a
+      .querySelector(`td:nth-child(${columnIndex})`)
+      .textContent.toLowerCase();
+    const cellB = b
+      .querySelector(`td:nth-child(${columnIndex})`)
+      .textContent.toLowerCase();
+    return cellA.localeCompare(cellB);
+  });
+
+  // Удаление существующих строк из tbody
+  while (tbody.firstChild) {
+    tbody.removeChild(tbody.firstChild);
+  }
+
+  // Добавление отсортированных строк обратно в tbody
+  rows.forEach((row) => {
+    tbody.appendChild(row);
+  });
+};
 
   const createForm = () => {
     const overlay = document.createElement('div');
@@ -133,11 +166,6 @@ const data = [
   <label class="form-label" for="surname">Фамилия:</label>
   <input class="form-input" name="surname"
    id="surname" type="text" required>
-  </div>
-    <div class="form-group">
-  <label class="form-label" for="name">Имя:</label>
-  <input class="form-input" name="name"
-   id="name" type="text" required>
   </div>
     <div class="form-group">
   <label class="form-label" for="phone">Телефон:</label>
@@ -162,7 +190,7 @@ const data = [
     form.append(...buttonGroup.btns);
     overlay.append(form);
     return {
-      overlay, form,
+      overlay, form, 
     };
   };
 
@@ -185,19 +213,19 @@ const data = [
       },
     ]);
     const table = createTable();
-    const form = createForm();
+    const {form, overlay} = createForm();
 
     header.headerContainer.append(logo);
     footer.footerContainer.append(footerText);
-    main.mainContainer.append(buttonGroup.btnWrapper, table, form.overlay);
+    main.mainContainer.append(buttonGroup.btnWrapper, table,overlay);
     app.append(header, main, footer);
     return {
       list: table.tbody,
       logo,
       btnAdd: buttonGroup.btns[0],
       btnDel: buttonGroup.btns[1],
-      formOverlay: form.overlay,
-      form:form.form,
+      formOverlay: overlay,
+      form,
     };
   };
 
@@ -250,48 +278,83 @@ const data = [
     return allRow;
   };
 
+const modalControl = (btnAdd, formOverlay) => {
+
+  const openModal = () => {
+    formOverlay.classList.add("is-visible");
+  };
+
+  const closeModal = () => {
+    formOverlay.classList.remove("is-visible");
+  }
+
+    btnAdd.addEventListener('click', (openModal));
+
+    formOverlay.addEventListener('click', (e) => {
+       const target = e.target;
+      if(target === formOverlay || 
+        target.classList.contains('close')){
+       closeModal();
+      }
+      
+    });
+    return {
+      closeModal,
+    }
+};
+
+const deleteControl = (btnDel, list) => {
+   btnDel.addEventListener("click", () => {
+     document.querySelectorAll(".delete").forEach((del) => {
+       del.classList.toggle("is-visible");
+     });
+   });
+   list.addEventListener("click", (e) => {
+     const target = e.target;
+     if (target.closest(".del-icon")) {
+       target.closest(".contact").remove();
+     }
+   });
+};
+
+const addContactPage = (contact, list) => {
+  list.append(createRow(contact));
+};
+
+const formControl = (form, list, closeModal) => {
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const newContact = Object.fromEntries(formData);
+
+    addContactPage(newContact, list);
+    addContactData(newContact);
+    form.reset();
+    closeModal();
+    })
+}
   const init = (selectorApp, title) => {
     const app = document.querySelector(selectorApp);
-    const phoneBook = renderPhoneBook(app, title);
-    
+     
     const {
       list,
       logo,
       btnAdd,
       formOverlay,
       form,
-      btnDel} = phoneBook;
+      btnDel
+    } = renderPhoneBook(app, title);
 
     const allRow = renderContacts(list, data);
+    const {closeModal} = modalControl(btnAdd, formOverlay);
     hoverRow(allRow, logo);
+    deleteControl(btnDel, list);
+    formControl(form,list, closeModal);
 
-    btnAdd.addEventListener('click', () => {
-      formOverlay.classList.add('is-visible');
-    });
-
-    formOverlay.addEventListener('click', (e) => {
-       const target = e.target;
-      if(target === formOverlay || target.classList.contains('close')){
-        formOverlay.classList.remove("is-visible");
-      }
-      
-    });
     allRow.forEach((row) => {
       const buttonEdit = row.querySelector('td:last-child button');
       buttonEdit.addEventListener('click', handleEdit);
     });
-
-      btnDel.addEventListener("click", () => {
-        document.querySelectorAll('.delete').forEach(del => {
-          del.classList.toggle("is-visible");
-        });
-      });
-      list.addEventListener('click', e =>{
-        const target = e.target;
-        if(target.closest('.del-icon')){
-          target.closest('.contact').remove();
-        }
-      })
   };
 
   function handleEdit(event) {
