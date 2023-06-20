@@ -24,9 +24,16 @@ const data = [
 ];
 
 
-{ const addContactData = (contact) => {
+{
+  const addContactData = (contact) => {
   data.push(contact);
+  saveContactsToLocalStorage(data);
 };
+
+const saveContactsToLocalStorage = (contacts) => {
+  localStorage.setItem("contacts", JSON.stringify(contacts));
+};
+
   const createContainer = () => {
     const container = document.createElement('div');
     container.classList.add('container');
@@ -99,15 +106,16 @@ const data = [
 
     const thead = document.createElement('thead');
     thead.insertAdjacentHTML(
-        'beforeend',
-        `
+      "beforeend",
+      `
   <tr>
-    <th class="delete"Удалить></th>
+    <th class="delete">Удалить</th>
     <th>Имя</th>
     <th>Фамилия</th>
     <th>Телефон</th>
   </tr>
-  `);
+  `
+    );
     const tbody = document.createElement('tbody');
     table.append(thead, tbody);
     table.tbody = tbody;
@@ -302,6 +310,11 @@ const modalControl = (btnAdd, formOverlay) => {
       closeModal,
     }
 };
+const removeContactFromLocalStorage = (phone) => {
+  let contacts = JSON.parse(localStorage.getItem("contacts")) || [];
+  contacts = contacts.filter((contact) => contact.phone !== phone);
+  localStorage.setItem("contacts", JSON.stringify(contacts));
+};
 
 const deleteControl = (btnDel, list) => {
    btnDel.addEventListener("click", () => {
@@ -312,7 +325,10 @@ const deleteControl = (btnDel, list) => {
    list.addEventListener("click", (e) => {
      const target = e.target;
      if (target.closest(".del-icon")) {
-       target.closest(".contact").remove();
+       const contactRow = target.closest(".contact");
+        const phone = contactRow.querySelector("td:nth-child(4) a").textContent;
+        removeContactFromLocalStorage(phone);
+        contactRow.remove();
      }
    });
 };
@@ -335,17 +351,30 @@ const formControl = (form, list, closeModal) => {
 }
   const init = (selectorApp, title) => {
     const app = document.querySelector(selectorApp);
-     
+
+
+  let savedContacts = localStorage.getItem("contacts");
+  if (savedContacts) {
+    try {
+      savedContacts = JSON.parse(savedContacts);
+    } catch (error) {
+      console.error("Ошибка при разборе JSON:", error);
+      savedContacts = []; 
+    }
+  } else {
+    savedContacts = [];
+  }
+
     const {
       list,
       logo,
       btnAdd,
       formOverlay,
       form,
-      btnDel
+      btnDel,
     } = renderPhoneBook(app, title);
 
-    const allRow = renderContacts(list, data);
+    const allRow = renderContacts(list, savedContacts);
     const {closeModal} = modalControl(btnAdd, formOverlay);
     hoverRow(allRow, logo);
     deleteControl(btnDel, list);
@@ -362,4 +391,6 @@ const formControl = (form, list, closeModal) => {
   }
 
   window.phoneBookInit = init;
-}
+ 
+
+};
