@@ -1,6 +1,5 @@
-import { phoneBookInit } from "./script.js";
 
-const data = [
+export const data = [
   {
     name: "Иван",
     surname: "Петров",
@@ -23,11 +22,6 @@ const data = [
   },
 ];
 
-import { control } from "./control.js";
-import { createElement } from "./createElements.js";
-import { render } from "./render.js";
-import { serviceStorage } from "./serviceStorage";
-
 const addContactData = (contact) => {
   data.push(contact);
   saveContactsToLocalStorage(data);
@@ -41,6 +35,8 @@ const removeContactFromLocalStorage = (phone) => {
   contacts = contacts.filter((contact) => contact.phone !== phone);
   localStorage.setItem("contacts", JSON.stringify(contacts));
 };
+
+
 
 export default {
   addContactData,

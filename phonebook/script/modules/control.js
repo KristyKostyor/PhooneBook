@@ -1,9 +1,23 @@
-import { phoneBookInit } from "./script.js";
+import createElement from "./createElements.js";
+import serviceStorage from "./serviceStorage.js";
+const {
+  addContactData,
+  removeContactFromLocalStorage,
+} = serviceStorage;
 
-import { control } from "./control.js";
-import { createElement } from "./createElements.js";
-import { render } from "./render.js";
-import { serviceStorage } from "./serviceStorage";
+
+const {
+  createHeader,
+  createLogo,
+  createMain,
+  createFooter,
+  createCopyRight,
+  createButtonsGroup,
+  createTable,
+  sortTableByColumn,
+  createForm,
+  createRow,
+} = createElement;
 
 const modalControl = (btnAdd, formOverlay) => {
   const openModal = () => {
@@ -60,7 +74,9 @@ const formControl = (form, list, closeModal) => {
     closeModal();
   });
 };
+
 export default {
+  addContactPage,
   modalControl,
   deleteControl,
   formControl,

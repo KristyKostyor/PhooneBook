@@ -1,9 +1,17 @@
-import { phoneBookInit } from "./script.js";
+import createElement from "./createElements.js";
+const {
+  createHeader,
+  createLogo,
+  createMain,
+  createFooter,
+  createCopyRight,
+  createButtonsGroup,
+  createTable,
+  sortTableByColumn,
+  createForm,
+  createRow,
+} = createElement;
 
-import { control } from "./control.js";
-import { createElement } from "./createElements.js";
-import { render } from "./render.js";
-import { serviceStorage } from "./serviceStorage";
 
 const renderContacts = (elem, data) => {
   const allRow = data.map(createRow);

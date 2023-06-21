@@ -1,36 +1,46 @@
-import { control } from "./modules/control.js";
-import { createElement } from './modules/createElements.js';
-import { render } from './modules/render.js';
-import { serviceStorage } from './modules/serviceStorage';
+import serviceStorage from "./modules/serviceStorage.js";
+import { data } from './modules/serviceStorage.js';
+import createElement from "./modules/createElements.js";
+import render from './modules/render.js';
+import control from './modules/control.js';
+
+const { addContactPage,
+    modalControl,
+  deleteControl,
+  formControl,
+} = control;
 
 
-const data = [
-  {
-    name: "Иван",
-    surname: "Петров",
-    phone: "+79514545454",
-  },
-  {
-    name: "Игорь",
-    surname: "Семёнов",
-    phone: "+79999999999",
-  },
-  {
-    name: "Семён",
-    surname: "Иванов",
-    phone: "+79800252525",
-  },
-  {
-    name: "Мария",
-    surname: "Попова",
-    phone: "+79876543210"
-  },
-];
 
 
+
+const {
+  renderContacts,
+  renderPhoneBook,
+} = render;
+
+const {
+  addContactData,
+  saveContactsToLocalStorage,
+  removeContactFromLocalStorage,
+} = serviceStorage;
+
+const {
+  createHeader,
+  createLogo,
+  createMain,
+  createFooter,
+  createCopyRight,
+  createButtonsGroup,
+  createTable,
+  sortTableByColumn,
+  createForm,
+  createRow,
+} = createElement;
 
 
 {
+
   const hoverRow = (allRow, logo) => {
     const text = logo.textContent;
 
@@ -43,6 +53,9 @@ const data = [
       });
     });
   };
+
+
+
 
   const init = (selectorApp, title) => {
     const app = document.querySelector(selectorApp);
@@ -81,6 +94,4 @@ const data = [
   }
 
   window.phoneBookInit = init;
-  
 }
-export { init as phoneBookInit };
